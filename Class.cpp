@@ -295,39 +295,48 @@ bool Board::playerHasLegalMove(Color side) const {
         }
     return false;
 }
+// ═══════════════════════════════════════════════════════════════
+//                    Displaying Function Code  
+// ═══════════════════════════════════════════════════════════════
+void Board::draw(const string& whiteName, const string& blackName) const
+{
+    const string P = "                    ";  
+    const string TAB = "                 ";              
 
-// ═══════════════════════════════════════════════════════════════
-//                    Board DisplayIng Code 
-// ═══════════════════════════════════════════════════════════════
-void Board::draw(const string& whiteName, const string& blackName) const {
     cout << "\n";
-    cout << "  [ " << blackName << " - Black ]\n\n";
-    cout << "        a    b    c    d    e    f    g    h  \n";
-    cout << "      +----+----+----+----+----+----+----+----+\n";
-    for (int r = 0; r < 8; ++r) {
-        cout << "  " << (8 - r) << "   |";
-        for (int c = 0; c < 8; ++c) {
+
+    cout << P << TAB << "[ " << blackName << " - Black ]\n\n";
+
+    cout << P << "     a    b    c    d    e    f    g    h  \n";
+    cout << P << "   -----|----|----|----|----|----|----|-----\n";
+
+    for (int r = 0; r < 8; ++r)
+    {
+        cout << P << " " << (8 - r) << " |";
+        for (int c = 0; c < 8; ++c)
+        {
             Piece* pc = squares_[r][c];
-            bool   isLight = (r + c) % 2 == 0;
+            bool isLight = (r + c) % 2 == 0;
+
             if (pc)
                 cout << " " << pc->getSymbol() << "  |";
             else
                 cout << (isLight ? " .  " : "    ") << "|";
         }
-        cout << "  " << (8 - r) << "\n";
-        cout << "      +----+----+----+----+----+----+----+----+\n";
+        cout << " " << (8 - r) << "\n";
+        cout << P << "   -----|----|----|----|----|----|----|-----\n";
     }
-    cout << "        a    b    c    d    e    f    g    h  \n";
-    cout << "\n";
-    cout << "  [ " << whiteName << " - White ]\n";
-    cout << "\n";
-    cout << "  White: K=King  Q=Queen  R=Rook  B=Bishop  N=Knight  P=Pawn\n";
-    cout << "  Black: k=King  q=Queen  r=Rook  b=Bishop  n=Knight  p=Pawn\n";
+
+    cout << P << "     a    b    c    d    e    f    g    h  \n\n";
+
+    cout << P << TAB << "[ " << whiteName << " - White ]\n\n";
+
+    cout << P << "White: K=King  Q=Queen  R=Rook  B=Bishop  N=Knight  P=Pawn\n";
+    cout << P << "Black: k=King  q=Queen  r=Rook  b=Bishop  n=Knight  p=Pawn\n";
     cout << "\n";
 }
-
 // ═══════════════════════════════════════════════════════════════
-//                        Game 
+//                           Game 
 // ═══════════════════════════════════════════════════════════════
 Game::Game() : activeColor_(Color::WHITE), isOver_(false) {}
 

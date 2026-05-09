@@ -34,9 +34,33 @@ void MoveList::add(const Position& pos) {
 }
 
 int             MoveList::size()          const { return count_; }
-void            MoveList::clear() { count_ = 0; }
-Position& MoveList::operator[](int idx) { return moves_[idx]; }
-const Position& MoveList::operator[](int idx) const { return moves_[idx]; }
+void MoveList::clear()
+{
+    delete[] moves_;
+    moves_ = nullptr;
+    count_ = 0;
+    capacity_ = 0;
+}
+Position& MoveList::operator[](int idx)
+{
+    if (idx < 0 || idx >= count_)
+    {
+        cout << "[MoveList ERROR] Index " << idx
+            << " out of range! Size = " << count_ << endl;
+        exit(1);
+    }
+    return moves_[idx];
+}
+const Position& MoveList::operator[](int idx) const
+{
+    if (idx < 0 || idx >= count_)
+    {
+        cout << "[MoveList ERROR] Index " << idx
+            << " out of range! Size = " << count_ << endl;
+        exit(1);
+    }
+    return moves_[idx];
+}
 
 // ═══════════════════════════════════════════════════════════════
 //                    Piece base Class 

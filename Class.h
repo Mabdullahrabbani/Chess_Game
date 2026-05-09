@@ -1,17 +1,16 @@
 ﻿#pragma once
-
 #include <iostream>
 #include <string>
 using namespace std;
 
 // ─────────────────────────────────────────────
-//  Enumerations
+//               Enumerations
 // ─────────────────────────────────────────────
 enum class Color { WHITE, BLACK, NONE };
 enum class PieceType { PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING, EMPTY };
 
 // ─────────────────────────────────────────────
-//  Position helper struct
+//             Position helper struct
 // ─────────────────────────────────────────────
 struct Position {
     int row, col;
@@ -21,7 +20,7 @@ struct Position {
 };
 
 // ─────────────────────────────────────────────
-//  Custom dynamic array (replaces std::vector)
+//           Custom dynamic array 
 // ─────────────────────────────────────────────
 class MoveList {
 private:
@@ -42,7 +41,7 @@ public:
 };
 
 // ─────────────────────────────────────────────
-//  Forward declaration
+//             Forward declaration
 // ─────────────────────────────────────────────
 class Board;
 
@@ -68,7 +67,7 @@ public:
 };
 
 // ─────────────────────────────────────────────
-//  Concrete piece classes
+//            Concrete piece classes
 // ─────────────────────────────────────────────
 class Pawn : public Piece {
 public:
@@ -178,7 +177,7 @@ public:
 };
 
 // ─────────────────────────────────────────────
-//  UI helpers
+//               UI helpers
 // ─────────────────────────────────────────────
 void clearScreen();
 void showMainMenu();

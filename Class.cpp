@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 // ═══════════════════════════════════════════════════════════════
-//  MoveList  (custom dynamic array)
+//  MoveList  (It Is custom dynamic array)
 // ═══════════════════════════════════════════════════════════════
 MoveList::MoveList() : moves_(nullptr), count_(0), capacity_(0) {}
 
@@ -39,7 +39,7 @@ Position& MoveList::operator[](int idx) { return moves_[idx]; }
 const Position& MoveList::operator[](int idx) const { return moves_[idx]; }
 
 // ═══════════════════════════════════════════════════════════════
-//  Piece base
+//                    Piece base Class 
 // ═══════════════════════════════════════════════════════════════
 Piece::Piece(Color side, PieceType type)
     : sideColor_(side), pieceType_(type), everMoved_(false) {
@@ -51,7 +51,7 @@ bool      Piece::hasMoved()        const { return everMoved_; }
 void      Piece::markMoved(bool v) { everMoved_ = v; }
 
 // ═══════════════════════════════════════════════════════════════
-//  Pawn
+//                      Pawn Class 
 // ═══════════════════════════════════════════════════════════════
 Pawn::Pawn(Color side) : Piece(side, PieceType::PAWN) {}
 char Pawn::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'P' : 'p'; }
@@ -79,7 +79,7 @@ MoveList Pawn::getCandidateMoves(const Position& square, const Board& board) con
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Rook
+//                       Rook Class 
 // ═══════════════════════════════════════════════════════════════
 Rook::Rook(Color side) : Piece(side, PieceType::ROOK) {}
 char Rook::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'R' : 'r'; }
@@ -100,7 +100,7 @@ MoveList Rook::getCandidateMoves(const Position& square, const Board& board) con
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Knight
+//                        Knight Class 
 // ═══════════════════════════════════════════════════════════════
 Knight::Knight(Color side) : Piece(side, PieceType::KNIGHT) {}
 char Knight::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'N' : 'n'; }
@@ -117,7 +117,7 @@ MoveList Knight::getCandidateMoves(const Position& square, const Board& board) c
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Bishop
+//                      Bishop Class 
 // ═══════════════════════════════════════════════════════════════
 Bishop::Bishop(Color side) : Piece(side, PieceType::BISHOP) {}
 char Bishop::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'B' : 'b'; }
@@ -138,7 +138,7 @@ MoveList Bishop::getCandidateMoves(const Position& square, const Board& board) c
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Queen
+//                      Queen Class 
 // ═══════════════════════════════════════════════════════════════
 Queen::Queen(Color side) : Piece(side, PieceType::QUEEN) {}
 char Queen::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'Q' : 'q'; }
@@ -159,7 +159,7 @@ MoveList Queen::getCandidateMoves(const Position& square, const Board& board) co
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  King
+//                        King Class 
 // ═══════════════════════════════════════════════════════════════
 King::King(Color side) : Piece(side, PieceType::KING) {}
 char King::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'K' : 'k'; }
@@ -177,7 +177,7 @@ MoveList King::getCandidateMoves(const Position& square, const Board& board) con
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Board
+//                        Board Class 
 // ═══════════════════════════════════════════════════════════════
 Board::Board() { clearBoard(); setupPieces(); }
 
@@ -296,7 +296,9 @@ bool Board::playerHasLegalMove(Color side) const {
     return false;
 }
 
-// ── Board display ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+//                    Board DisplayIng Code 
+// ═══════════════════════════════════════════════════════════════
 void Board::draw(const string& whiteName, const string& blackName) const {
     cout << "\n";
     cout << "  [ " << blackName << " - Black ]\n\n";
@@ -325,7 +327,7 @@ void Board::draw(const string& whiteName, const string& blackName) const {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Game
+//                        Game 
 // ═══════════════════════════════════════════════════════════════
 Game::Game() : activeColor_(Color::WHITE), isOver_(false) {}
 
@@ -408,7 +410,7 @@ void Game::run() {
         string turnName = (activeColor_ == Color::WHITE) ? whiteName_ : blackName_;
         string turnColor = (activeColor_ == Color::WHITE) ? "White" : "Black";
 
-        // ── Check game-ending conditions ──────────────────
+         //  ────────────────── Check game-ending conditions ──────────────────
         if (!hasMove) {
             board_.draw(whiteName_, blackName_);
             cout << "  +=============================================+\n";
@@ -429,7 +431,7 @@ void Game::run() {
             return;
         }
 
-        // ── Display board ─────────────────────────────────
+        //  ──────────────────  Display board ─────────────────────────────────
         board_.draw(whiteName_, blackName_);
 
         if (inCheck)
@@ -442,7 +444,7 @@ void Game::run() {
         bool moveMade = false;
         while (!moveMade) {
 
-            // ── Piece selection ───────────────────────────
+            //  ────────────────── Piece selection ───────────────────────────
             Position from;
             MoveList legal;
 
@@ -474,7 +476,7 @@ void Game::run() {
                 break;
             }
 
-            // ── Show legal destinations ───────────────────
+            //  ──────────────────Show legal destinations ───────────────────
             cout << "\n";
             cout << "  Piece: '" << board_.getPieceAt(from)->getSymbol()
                 << "'  at  " << squareToString(from) << "\n";
@@ -485,7 +487,7 @@ void Game::run() {
             }
             cout << "\n\n";
 
-            // ── Destination selection ─────────────────────
+            // ── ────────────────── Destination selection ─────────────────────
             while (true) {
                 cout << "  >> Enter destination (or '!' to re-pick piece): ";
                 string toInput;
@@ -523,7 +525,7 @@ void Game::run() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  UI helpers
+//                          UI helpers
 // ═══════════════════════════════════════════════════════════════
 void clearScreen() {
 #ifdef _WIN32

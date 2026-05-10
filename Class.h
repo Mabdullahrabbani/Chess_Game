@@ -1,26 +1,27 @@
-﻿#pragma once
+#pragma once
+
 #include <iostream>
 #include <string>
 using namespace std;
 
 // ─────────────────────────────────────────────
-//               Enumerations
+//  Enumerations
 // ─────────────────────────────────────────────
 enum class Color { WHITE, BLACK, NONE };
 enum class PieceType { PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING, EMPTY };
 
 // ─────────────────────────────────────────────
-//             Position helper struct
+//  Position
 // ─────────────────────────────────────────────
 struct Position {
     int row, col;
     Position(int r = -1, int c = -1) : row(r), col(c) {}
-    bool isValid()                    const { return row >= 0 && row < 8 && col >= 0 && col < 8; }
+    bool isValid() const { return row >= 0 && row < 8 && col >= 0 && col < 8; }
     bool operator==(const Position& other) const { return row == other.row && col == other.col; }
 };
 
 // ─────────────────────────────────────────────
-//           Custom dynamic array 
+//  MoveList  (custom dynamic array)
 // ─────────────────────────────────────────────
 class MoveList {
 private:
@@ -34,19 +35,19 @@ public:
     ~MoveList();
 
     void            add(const Position& pos);
-    int             size()      const;
+    int             size()             const;
     void            clear();
     Position& operator[](int idx);
     const Position& operator[](int idx) const;
 };
 
 // ─────────────────────────────────────────────
-//             Forward declaration
+//  Forward declaration
 // ─────────────────────────────────────────────
 class Board;
 
 // ─────────────────────────────────────────────
-//  Abstract base class – Piece
+//  Piece  (abstract base)
 // ─────────────────────────────────────────────
 class Piece {
 protected:
@@ -57,9 +58,9 @@ public:
     Piece(Color side, PieceType type);
     virtual ~Piece() {}
 
-    Color     getColor()      const;
-    PieceType getType()       const;
-    bool      hasMoved()      const;
+    Color     getColor()              const;
+    PieceType getType()               const;
+    bool      hasMoved()              const;
     void      markMoved(bool moved);
 
     virtual MoveList getCandidateMoves(const Position& square, const Board& board) const = 0;
@@ -67,7 +68,7 @@ public:
 };
 
 // ─────────────────────────────────────────────
-//            Concrete piece classes
+//  Concrete piece classes
 // ─────────────────────────────────────────────
 class Pawn : public Piece {
 public:
@@ -112,7 +113,7 @@ public:
 };
 
 // ─────────────────────────────────────────────
-//  Board  (Composition: owns all Piece objects)
+//                   Board
 // ─────────────────────────────────────────────
 class Board {
 private:
@@ -125,15 +126,14 @@ public:
     Board(const Board&) = delete;
     Board& operator=(const Board&) = delete;
 
-    Piece* getPieceAt(const Position& pos)              const;
-    Piece* getPieceAt(int row, int col)                 const;
-    bool   isSquareEmpty(const Position& pos)           const;
+    Piece* getPieceAt(const Position& pos)                const;
+    Piece* getPieceAt(int row, int col)                   const;
+    bool   isSquareEmpty(const Position& pos)             const;
     bool   isSquareEnemy(const Position& pos, Color side) const;
 
     void movePiece(const Position& from, const Position& to);
     void placePiece(const Position& pos, Piece* newPiece);
 
-    // Template: simulate a move, run callable, then restore
     template <typename Func>
     void tryMove(const Position& from, const Position& to, Func callback) {
         Piece* moving = squares_[from.row][from.col];
@@ -155,7 +155,7 @@ public:
 };
 
 // ─────────────────────────────────────────────
-//  Game – controls the full game loop
+//                      Game
 // ─────────────────────────────────────────────
 class Game {
 private:
@@ -165,9 +165,9 @@ private:
     Color  activeColor_;
     bool   isOver_;
 
-    Color    getOpponent(Color side)                    const;
-    Position parseInput(const string& input, bool& ok)  const;
-    string   squareToString(const Position& pos)        const;
+    Color    getOpponent(Color side)                   const;
+    Position parseInput(const string& input, bool& ok) const;
+    string   squareToString(const Position& pos)       const;
     void     handlePromotion(const Position& pos);
     void     passTurn();
 public:
@@ -177,9 +177,10 @@ public:
 };
 
 // ─────────────────────────────────────────────
-//               UI helpers
+//                 UI helpers
 // ─────────────────────────────────────────────
 void clearScreen();
 void showMainMenu();
 bool confirmExit();
 void collectPlayerNames(string& white, string& black);
+void enableAnsiColors();

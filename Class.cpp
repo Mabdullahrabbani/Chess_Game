@@ -1,8 +1,24 @@
-﻿#include "Class.h"
+#include "Class.h"
 #include <cstdlib>
+#include <iomanip>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 // ═══════════════════════════════════════════════════════════════
-//  MoveList  (It Is custom dynamic array)
+//  ANSI color enable
+// ═══════════════════════════════════════════════════════════════
+void enableAnsiColors()
+{
+#ifdef _WIN32
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD  dwMode = 0;
+    GetConsoleMode(hOut, &dwMode);
+    SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+#endif
+}
+// ═══════════════════════════════════════════════════════════════
+//  MoveList
 // ═══════════════════════════════════════════════════════════════
 MoveList::MoveList() : moves_(nullptr), count_(0), capacity_(0) {}
 
@@ -24,8 +40,7 @@ void MoveList::add(const Position& pos) {
     if (count_ == capacity_) {
         int       newCap = (capacity_ == 0) ? 4 : capacity_ * 2;
         Position* temp = new Position[newCap];
-        for (int i = 0; i < count_; ++i) 
-            temp[i] = moves_[i];
+        for (int i = 0; i < count_; ++i) temp[i] = moves_[i];
         delete[] moves_;
         moves_ = temp;
         capacity_ = newCap;
@@ -33,37 +48,33 @@ void MoveList::add(const Position& pos) {
     moves_[count_++] = pos;
 }
 
-int             MoveList::size()          const { return count_; }
-void MoveList::clear()
-{
+int MoveList::size() const { return count_; }
+
+void MoveList::clear() {
     delete[] moves_;
     moves_ = nullptr;
     count_ = 0;
     capacity_ = 0;
 }
-Position& MoveList::operator[](int idx)
-{
-    if (idx < 0 || idx >= count_)
-    {
-        cout << "[MoveList ERROR] Index " << idx
-            << " out of range! Size = " << count_ << endl;
+
+Position& MoveList::operator[](int idx) {
+    if (idx < 0 || idx >= count_) {
+        cout << "[MoveList ERROR] Index " << idx << " out of range! Size = " << count_ << endl;
         exit(1);
     }
     return moves_[idx];
 }
-const Position& MoveList::operator[](int idx) const
-{
-    if (idx < 0 || idx >= count_)
-    {
-        cout << "[MoveList ERROR] Index " << idx
-            << " out of range! Size = " << count_ << endl;
+
+const Position& MoveList::operator[](int idx) const {
+    if (idx < 0 || idx >= count_) {
+        cout << "[MoveList ERROR] Index " << idx << " out of range! Size = " << count_ << endl;
         exit(1);
     }
     return moves_[idx];
 }
 
 // ═══════════════════════════════════════════════════════════════
-//                    Piece base Class 
+//  Piece base
 // ═══════════════════════════════════════════════════════════════
 Piece::Piece(Color side, PieceType type)
     : sideColor_(side), pieceType_(type), everMoved_(false) {
@@ -75,7 +86,7 @@ bool      Piece::hasMoved()        const { return everMoved_; }
 void      Piece::markMoved(bool v) { everMoved_ = v; }
 
 // ═══════════════════════════════════════════════════════════════
-//                      Pawn Class 
+//  Pawn
 // ═══════════════════════════════════════════════════════════════
 Pawn::Pawn(Color side) : Piece(side, PieceType::PAWN) {}
 char Pawn::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'P' : 'p'; }
@@ -87,8 +98,7 @@ MoveList Pawn::getCandidateMoves(const Position& square, const Board& board) con
     Position oneStep(square.row + advance, square.col);
     if (oneStep.isValid() && board.isSquareEmpty(oneStep)) {
         result.add(oneStep);
-        bool onStartRank = (sideColor_ == Color::WHITE) ? (square.row == 6)
-            : (square.row == 1);
+        bool onStartRank = (sideColor_ == Color::WHITE) ? (square.row == 6) : (square.row == 1);
         Position twoStep(square.row + 2 * advance, square.col);
         if (onStartRank && twoStep.isValid() && board.isSquareEmpty(twoStep))
             result.add(twoStep);
@@ -103,7 +113,7 @@ MoveList Pawn::getCandidateMoves(const Position& square, const Board& board) con
 }
 
 // ═══════════════════════════════════════════════════════════════
-//                       Rook Class 
+//  Rook
 // ═══════════════════════════════════════════════════════════════
 Rook::Rook(Color side) : Piece(side, PieceType::ROOK) {}
 char Rook::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'R' : 'r'; }
@@ -124,7 +134,7 @@ MoveList Rook::getCandidateMoves(const Position& square, const Board& board) con
 }
 
 // ═══════════════════════════════════════════════════════════════
-//                        Knight Class 
+//  Knight
 // ═══════════════════════════════════════════════════════════════
 Knight::Knight(Color side) : Piece(side, PieceType::KNIGHT) {}
 char Knight::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'N' : 'n'; }
@@ -141,7 +151,7 @@ MoveList Knight::getCandidateMoves(const Position& square, const Board& board) c
 }
 
 // ═══════════════════════════════════════════════════════════════
-//                      Bishop Class 
+//  Bishop
 // ═══════════════════════════════════════════════════════════════
 Bishop::Bishop(Color side) : Piece(side, PieceType::BISHOP) {}
 char Bishop::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'B' : 'b'; }
@@ -162,7 +172,7 @@ MoveList Bishop::getCandidateMoves(const Position& square, const Board& board) c
 }
 
 // ═══════════════════════════════════════════════════════════════
-//                      Queen Class 
+//  Queen
 // ═══════════════════════════════════════════════════════════════
 Queen::Queen(Color side) : Piece(side, PieceType::QUEEN) {}
 char Queen::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'Q' : 'q'; }
@@ -183,7 +193,7 @@ MoveList Queen::getCandidateMoves(const Position& square, const Board& board) co
 }
 
 // ═══════════════════════════════════════════════════════════════
-//                        King Class 
+//  King
 // ═══════════════════════════════════════════════════════════════
 King::King(Color side) : Piece(side, PieceType::KING) {}
 char King::getSymbol() const { return (sideColor_ == Color::WHITE) ? 'K' : 'k'; }
@@ -201,7 +211,7 @@ MoveList King::getCandidateMoves(const Position& square, const Board& board) con
 }
 
 // ═══════════════════════════════════════════════════════════════
-//                        Board Class 
+//  Board
 // ═══════════════════════════════════════════════════════════════
 Board::Board() { clearBoard(); setupPieces(); }
 
@@ -218,14 +228,12 @@ void Board::clearBoard() {
 }
 
 void Board::setupPieces() {
-    // Black back rank (row 0)
     squares_[0][0] = new Rook(Color::BLACK);   squares_[0][1] = new Knight(Color::BLACK);
     squares_[0][2] = new Bishop(Color::BLACK); squares_[0][3] = new Queen(Color::BLACK);
     squares_[0][4] = new King(Color::BLACK);   squares_[0][5] = new Bishop(Color::BLACK);
     squares_[0][6] = new Knight(Color::BLACK); squares_[0][7] = new Rook(Color::BLACK);
     for (int c = 0; c < 8; ++c) squares_[1][c] = new Pawn(Color::BLACK);
 
-    // White back rank (row 7)
     squares_[7][0] = new Rook(Color::WHITE);   squares_[7][1] = new Knight(Color::WHITE);
     squares_[7][2] = new Bishop(Color::WHITE); squares_[7][3] = new Queen(Color::WHITE);
     squares_[7][4] = new King(Color::WHITE);   squares_[7][5] = new Bishop(Color::WHITE);
@@ -248,6 +256,7 @@ Piece* Board::getPieceAt(int row, int col) const { return getPieceAt(Position(ro
 bool Board::isSquareEmpty(const Position& pos) const {
     return pos.isValid() && !squares_[pos.row][pos.col];
 }
+
 bool Board::isSquareEnemy(const Position& pos, Color side) const {
     if (!pos.isValid()) return false;
     Piece* pc = squares_[pos.row][pos.col];
@@ -314,54 +323,93 @@ bool Board::playerHasLegalMove(Color side) const {
         for (int c = 0; c < 8; ++c) {
             Piece* piece = squares_[r][c];
             if (!piece || piece->getColor() != side) continue;
-            MoveList moves = getLegalMoves(Position(r, c), side);
-            if (moves.size() > 0) return true;
+            if (getLegalMoves(Position(r, c), side).size() > 0) return true;
         }
     return false;
 }
+
 // ═══════════════════════════════════════════════════════════════
-//                    Displaying Function Code  
+//  Board::draw()
 // ═══════════════════════════════════════════════════════════════
 void Board::draw(const string& whiteName, const string& blackName) const
 {
-    const string P = "                    ";  
-    const string TAB = "                 ";              
+    const string RESET = "\033[0m";
+    const string LIGHT_SQ = "\033[48;5;229m";      
+    const string DARK_SQ = "\033[48;5;130m";       
+    const string WHITE_PC = "\033[38;5;51m\033[1m";
+    const string BLACK_PC = "\033[38;5;16m\033[1m";
+    const string BORDER = "\033[1;36m";            
+    const string COORD = "\033[1;33m";             
+    const string AQUA_LBL = "\033[38;5;51m\033[1m";
+    const string MAG_LBL = "\033[1;35m";           
 
-    cout << "\n";
+    const string PAD = "                    ";
+    const int    BOARD_W = 52;
 
-    cout << P << TAB << "[ " << blackName << " - Black ]\n\n";
+    auto centre = [&](const string& txt) -> string {
+        int space = BOARD_W - (int)txt.size();
+        int left = space / 2;
+        int right = space - left;
+        return string(left, ' ') + txt + string(right, ' ');
+        };
 
-    cout << P << "     a    b    c    d    e    f    g    h  \n";
-    cout << P << "   -----|----|----|----|----|----|----|-----\n";
+    // Black player name — magenta, centered
+    cout << "\n" << PAD << MAG_LBL
+        << centre("[ " + blackName + " - Black ]")
+        << RESET << "\n\n";
+
+    cout << PAD << COORD
+        << "      a    b    c    d    e    f    g    h  "
+        << RESET << "\n";
+    cout << PAD << BORDER
+        << "    -----|----|----|----|----|----|----|-----"
+        << RESET << "\n";
 
     for (int r = 0; r < 8; ++r)
     {
-        cout << P << " " << (8 - r) << " |";
+        cout << PAD << COORD << " " << (8 - r) << "  " << RESET;
+        cout << BORDER << "|" << RESET;
+
         for (int c = 0; c < 8; ++c)
         {
             Piece* pc = squares_[r][c];
-            bool isLight = (r + c) % 2 == 0;
+            bool   isLight = (r + c) % 2 == 0;
+            string sq = isLight ? LIGHT_SQ : DARK_SQ;
 
             if (pc)
-                cout << " " << pc->getSymbol() << "  |";
+            {
+                string pcColor = (pc->getColor() == Color::WHITE) ? WHITE_PC : BLACK_PC;
+                cout << sq << pcColor << " " << pc->getSymbol() << "  " << RESET;
+            }
             else
-                cout << (isLight ? " .  " : "    ") << "|";
+            {
+                cout << sq << "    " << RESET;
+            }
+            cout << BORDER << "|" << RESET;
         }
-        cout << " " << (8 - r) << "\n";
-        cout << P << "   -----|----|----|----|----|----|----|-----\n";
+        cout << COORD << " " << (8 - r) << RESET << "\n";
+        cout << PAD << BORDER
+            << "    |----|----|----|----|----|----|----|-----"
+            << RESET << "\n";
     }
 
-    cout << P << "     a    b    c    d    e    f    g    h  \n\n";
+    cout << PAD << COORD
+        << "      a    b    c    d    e    f    g    h  "
+        << RESET << "\n\n";
 
-    cout << P << TAB << "[ " << whiteName << " - White ]\n\n";
+    // White player name — aqua, centred
+    cout << PAD << AQUA_LBL
+        << centre("[ " + whiteName + " - White ]")
+        << RESET << "\n\n";
 
-    cout << P << "White: K=King  Q=Queen  R=Rook  B=Bishop  N=Knight  P=Pawn\n";
-    cout << P << "Black: k=King  q=Queen  r=Rook  b=Bishop  n=Knight  p=Pawn\n";
+    // Legend — "White" in aqua, "Black" in magenta
+    cout << PAD << AQUA_LBL << "White" << RESET
+        << ": K=King  Q=Queen  R=Rook  B=Bishop  N=Knight  P=Pawn\n";
+    cout << PAD << MAG_LBL << "Black" << RESET
+        << ": k=King  q=Queen  r=Rook  b=Bishop  n=Knight  p=Pawn\n";
     cout << "\n";
 }
-// ═══════════════════════════════════════════════════════════════
-//                           Game 
-// ═══════════════════════════════════════════════════════════════
+
 Game::Game() : activeColor_(Color::WHITE), isOver_(false) {}
 
 void Game::setPlayers(const string& white, const string& black) {
@@ -410,7 +458,7 @@ void Game::handlePromotion(const Position& pos) {
     cout << "  +------------------------------------------+\n";
     cout << "  |          *** PAWN PROMOTION! ***         |\n";
     cout << "  +------------------------------------------+\n";
-    cout << "  |  " << ownerName << ", your pawn reached the end!      \n";
+    cout << "  |  " << ownerName << ", your pawn reached the end!\n";
     cout << "  |  Choose a piece to promote to:           |\n";
     cout << "  |    Q = Queen    R = Rook                 |\n";
     cout << "  |    B = Bishop   N = Knight               |\n";
@@ -443,7 +491,6 @@ void Game::run() {
         string turnName = (activeColor_ == Color::WHITE) ? whiteName_ : blackName_;
         string turnColor = (activeColor_ == Color::WHITE) ? "White" : "Black";
 
-         //  ────────────────── Check game-ending conditions ──────────────────
         if (!hasMove) {
             board_.draw(whiteName_, blackName_);
             cout << "  +=============================================+\n";
@@ -464,7 +511,6 @@ void Game::run() {
             return;
         }
 
-        //  ──────────────────  Display board ─────────────────────────────────
         board_.draw(whiteName_, blackName_);
 
         if (inCheck)
@@ -473,11 +519,8 @@ void Game::run() {
         cout << "  Turn:  " << turnName << " (" << turnColor << ")\n";
         cout << "  Tip: type '!' at the destination prompt to re-pick your piece.\n\n";
 
-        // ── Outer loop: repeat until a full valid move is made ────
         bool moveMade = false;
         while (!moveMade) {
-
-            //  ────────────────── Piece selection ───────────────────────────
             Position from;
             MoveList legal;
 
@@ -509,7 +552,6 @@ void Game::run() {
                 break;
             }
 
-            //  ──────────────────Show legal destinations ───────────────────
             cout << "\n";
             cout << "  Piece: '" << board_.getPieceAt(from)->getSymbol()
                 << "'  at  " << squareToString(from) << "\n";
@@ -520,16 +562,12 @@ void Game::run() {
             }
             cout << "\n\n";
 
-            // ── ────────────────── Destination selection ─────────────────────
             while (true) {
                 cout << "  >> Enter destination (or '!' to re-pick piece): ";
                 string toInput;
                 cin >> toInput;
 
-                if (toInput == "!") {
-                    cout << "\n";
-                    break;          // break inner → outer loop re-runs piece selection
-                }
+                if (toInput == "!") { cout << "\n"; break; }
 
                 bool ok;
                 Position dest = parseInput(toInput, ok);
@@ -551,15 +589,11 @@ void Game::run() {
                 handlePromotion(dest);
                 passTurn();
                 moveMade = true;
-                break;          // break inner → moveMade=true exits outer loop too
+                break;
             }
         }
     }
 }
-
-// ═══════════════════════════════════════════════════════════════
-//                          UI helpers
-// ═══════════════════════════════════════════════════════════════
 void clearScreen() {
 #ifdef _WIN32
     system("cls");
@@ -567,44 +601,112 @@ void clearScreen() {
     system("clear");
 #endif
 }
-
 void showMainMenu() {
     clearScreen();
-    cout << "  +=================================================+\n";
-    cout << "  |                                                 |\n";
-    cout << "  |           T H E   C H E S S   G A M E           |\n";
-    cout << "  |                                                 |\n";
-    cout << "  +=================================================+\n\n";
-    cout << "         1.  New Match  (2 Players)\n";
-    cout << "         2.  Exit\n\n";
-    cout << "  Select an option (1 or 2): ";
+
+    const string GREEN = "\033[38;5;220m";
+    const string RESET = "\033[0m";
+
+    string Padding = "                                        ";
+
+    cout << GREEN;
+
+    cout << "\n\n\n\n\n\n\n";
+
+    cout << Padding << "====================================================\n\n";
+    cout << Padding << "          WELCOME TO THE THRONE OF TECTICS          \n";
+    cout << Padding << "====================================================\n\n";
+
+    cout << Padding << "                 [1] START NEW MATCH\n\n";
+
+    cout << Padding << "                 [2] EXIT GAME\n\n";
+
+    cout << Padding << "====================================================\n\n";
+
+    cout << Padding << "           Select an option (1 or 2): ";
+
+    cout << RESET;
 }
 
 bool confirmExit() {
     clearScreen();
-    cout << "  +=================================================+\n";
-    cout << "  |               CONFIRM EXIT                      |\n";
-    cout << "  +=================================================+\n\n";
-    cout << "  Are you sure you want to quit? (Y / N): ";
+
+    const string GREEN = "\033[38;5;220m";
+    const string RESET = "\033[0m";
+
+    string Padding = "                                        ";
+
+    cout << GREEN;
+
+    cout << "\n\n\n\n\n\n\n\n";
+
+    cout << Padding << "====================================================\n";
+    cout << Padding << "                    CONFIRMATION\n";
+    cout << Padding << "====================================================\n\n";
+
+    cout << Padding << "        Are you sure you want to quit?\n\n";
+
+    cout << Padding << "                 [Y] YES\n\n";
+    cout << Padding << "                 [N] NO\n\n";
+
+    cout << Padding << "====================================================\n\n";
+
+    cout << Padding << "                 Enter your choice: ";
+
+    cout << RESET;
+
     char ch;
     cin >> ch;
+
     return (ch == 'Y' || ch == 'y');
 }
-
 void collectPlayerNames(string& white, string& black) {
     clearScreen();
-    cout << "  +=================================================+\n";
-    cout << "  |               PLAYER  SETUP                     |\n";
-    cout << "  +=================================================+\n\n";
-    cout << "  Player 1 name (White pieces): ";
+
+    const string GREEN = "\033[38;5;220m";
+    const string RESET = "\033[0m";
+
+    cout << GREEN;
+
+    string Padding = "                                        ";
+    string Padding2 = "                                   ";
+
+    cout << "\n\n\n\n\n\n\n";
+
+    cout << Padding << "====================================================\n\n";
+    cout << Padding << "                 PLAYER REGISTRATION                \n\n";
+    cout << Padding << "====================================================\n\n";
+
+    cout << Padding << "       Enter name for Player 1 (White): ";
     cin >> white;
-    cout << "  Player 2 name (Black pieces): ";
-    cin >> black;
+
     cout << "\n";
-    cout << "  Piece key:\n";
-    cout << "    White: K=King  Q=Queen  R=Rook  B=Bishop  N=Knight  P=Pawn\n";
-    cout << "    Black: k=King  q=Queen  r=Rook  b=Bishop  n=Knight  p=Pawn\n\n";
-    cout << "  Press ENTER to begin...";
+
+    cout << Padding << "       Enter name for Player 2 (Black): ";
+    cin >> black;
+
+    cout << "\n\n";
+    cout << Padding << "               Press ENTER to start....";
+    cout << RESET;
+
     cin.ignore();
+    cin.get();
+    clearScreen();
+    cout << "\n\n\n\n\n\n\n";
+    cout << GREEN;
+
+    cout << Padding << "====================================================\n\n";
+    cout << Padding << "                      REMINDER                       \n\n";
+    cout << Padding << "====================================================\n\n";
+
+    cout << Padding << "                   Piece Legend:\n\n";
+
+    cout << Padding2 << "  White: K=King  Q=Queen  R=Rook  B=Bishop  N=Knight  P=Pawn\n\n";
+
+    cout << Padding2 << "  Black: k=King  q=Queen  r=Rook  b=Bishop  n=Knight  p=Pawn\n\n";
+
+    cout << Padding << "               Press ENTER to start....";
+    cout << RESET;
+
     cin.get();
 }
